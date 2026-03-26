@@ -253,7 +253,7 @@ Issues and pull requests are welcome. If you find a bug or have a feature sugges
 
 ## Roadmap
 
-A native Zendesk app version of this tool is in development. See [`NATIVE_APP_BLUEPRINT.md`](./NATIVE_APP_BLUEPRINT.md) for the technical specification.
+A native Zendesk app version of this tool is in development. See [`NATIVE_APP_BLUEPRINT.md`](./native_app_blueprint.md) for the technical specification.
 
 ---
 
@@ -265,6 +265,6 @@ MIT — see [LICENSE](./LICENSE) for details.
 
 ## Built with
 
-- [Zendesk Queue Events API](https://developer.zendesk.com/api-reference/ticketing/ticket-management/queue_events/)
-- [Zendesk Queues API](https://developer.zendesk.com/api-reference/ticketing/ticket-management/queues/)
+- [Zendesk Queue Events API](https://developer.zendesk.com/api-reference/agent-availability/queue-events/queue_events/)
+- [Zendesk Queues API](https://developer.zendesk.com/api-reference/agent-availability/omnichannel_routing_queues/omnichannel_routing_queues/)
 - [Google Apps Script](https://developers.google.com/apps-script)
