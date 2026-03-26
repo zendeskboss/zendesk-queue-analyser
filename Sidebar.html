@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Google Sans', Roboto, Arial, sans-serif;
+      font-size: 13px;
+      color: #202124;
+      background: #f8f9fa;
+      padding: 16px;
+    }
+
+    .logo-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #1F3864;
+    }
+
+    .logo-bar .icon { font-size: 20px; }
+
+    .logo-bar h2 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1F3864;
+    }
+
+    .status-banner {
+      display: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
+    .status-banner.success {
+      background: #e6f4ea;
+      color: #137333;
+      border: 1px solid #a8d5b3;
+      display: block;
+    }
+
+    .status-banner.error {
+      background: #fce8e6;
+      color: #c5221f;
+      border: 1px solid #f5c6c4;
+      display: block;
+    }
+
+    .existing-creds {
+      background: #e8f0fe;
+      border: 1px solid #c5d8fb;
+      border-radius: 6px;
+      padding: 10px 12px;
+      margin-bottom: 14px;
+      font-size: 12px;
+      color: #1967d2;
+    }
+
+    .existing-creds strong { display: block; margin-bottom: 2px; color: #174ea6; }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: #444;
+      margin-bottom: 4px;
+      margin-top: 12px;
+    }
+
+    label span.hint {
+      font-weight: 400;
+      color: #888;
+      font-size: 11px;
+      margin-left: 4px;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #dadce0;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #202124;
+      background: #fff;
+      transition: border-color 0.15s;
+      outline: none;
+    }
+
+    input:focus { border-color: #1a73e8; box-shadow: 0 0 0 2px #e8f0fe; }
+    input.error  { border-color: #c5221f; }
+
+    .helper-text {
+      font-size: 11px;
+      color: #888;
+      margin-top: 3px;
+      line-height: 1.4;
+    }
+
+    .helper-text a { color: #1a73e8; }
+
+    .btn {
+      display: block;
+      width: 100%;
+      margin-top: 18px;
+      padding: 9px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, opacity 0.15s;
+    }
+
+    .btn-primary {
+      background: #1F3864;
+      color: #fff;
+    }
+    .btn-primary:hover { background: #16305a; }
+    .btn-primary:disabled { opacity: 0.6; cursor: default; }
+
+    .btn-secondary {
+      background: #f1f3f4;
+      color: #444;
+      margin-top: 8px;
+    }
+    .btn-secondary:hover { background: #e8eaed; }
+
+    .spinner {
+      display: inline-block;
+      width: 12px; height: 12px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .divider {
+      margin: 16px 0;
+      border: none;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    .token-tip {
+      background: #fff8e1;
+      border: 1px solid #ffe082;
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 11px;
+      color: #5f4a00;
+      margin-top: 14px;
+      line-height: 1.5;
+    }
+    .token-tip strong { color: #3e2e00; }
+  </style>
+</head>
+<body>
+
+  <div class="logo-bar">
+    <span class="icon">🎯</span>
+    <h2>Queue Analyser — Credentials</h2>
+  </div>
+
+  <div id="existingCreds" class="existing-creds" style="display:none">
+    <strong>✅ Already connected</strong>
+    <span id="existingSubdomain"></span>
+  </div>
+
+  <div id="statusBanner" class="status-banner"></div>
+
+  <label>Zendesk subdomain <span class="hint">(required)</span></label>
+  <input type="text" id="subdomain" placeholder="yourcompany" autocomplete="off" />
+  <div class="helper-text">Just the subdomain part — e.g. <strong>yourcompany</strong> from yourcompany.zendesk.com</div>
+
+  <label>Admin email address <span class="hint">(required)</span></label>
+  <input type="email" id="email" placeholder="admin@yourcompany.com" autocomplete="off" />
+
+  <label>API token <span class="hint">(required)</span></label>
+  <input type="password" id="token" placeholder="Paste your API token here" autocomplete="off" />
+
+  <div class="token-tip">
+    <strong>Where to find your API token:</strong><br>
+    Zendesk Admin Center → Apps &amp; integrations → APIs → Zendesk API → API tokens → Add API token
+  </div>
+
+  <button class="btn btn-primary" id="saveBtn" onclick="saveCredentials()">
+    🔌 Test &amp; save connection
+  </button>
+
+  <button class="btn btn-secondary" id="clearBtn" onclick="clearCredentials()">
+    🗑️ Clear saved credentials
+  </button>
+
+  <hr class="divider">
+
+  <div class="helper-text">
+    Your credentials are stored securely in your Google account's user properties and are never shared with anyone else. They are only used to make requests to your own Zendesk account.
+  </div>
+
+<script>
+  // Load existing creds on open
+  google.script.run
+    .withSuccessHandler(function(creds) {
+      if (creds.subdomain) {
+        document.getElementById('subdomain').value = creds.subdomain;
+        document.getElementById('email').value     = creds.email;
+        if (creds.hasToken) {
+          document.getElementById('token').placeholder = '••••••••••••••• (saved)';
+          var el = document.getElementById('existingCreds');
+          document.getElementById('existingSubdomain').textContent =
+            'Connected to: ' + creds.subdomain + '.zendesk.com';
+          el.style.display = 'block';
+        }
+      }
+    })
+    .getStoredCredentials();
+
+  function saveCredentials() {
+    var subdomain = document.getElementById('subdomain').value.trim();
+    var email     = document.getElementById('email').value.trim();
+    var token     = document.getElementById('token').value.trim();
+
+    // Client-side validation
+    if (!subdomain) { showError("Please enter your Zendesk subdomain."); return; }
+    if (!email)     { showError("Please enter your admin email address."); return; }
+    if (!token)     { showError("Please enter your API token."); return; }
+    if (!email.includes('@')) { showError("That doesn't look like a valid email address."); return; }
+
+    var btn = document.getElementById('saveBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Testing connection…';
+    hideBanner();
+
+    google.script.run
+      .withSuccessHandler(function(result) {
+        btn.disabled = false;
+        btn.innerHTML = '🔌 Test &amp; save connection';
+        if (result.success) {
+          showSuccess('✅ ' + result.message + '\n\nYou can now close this sidebar and run Load queues.');
+          document.getElementById('existingCreds').style.display = 'block';
+          document.getElementById('existingSubdomain').textContent = 'Connected to: ' + subdomain + '.zendesk.com';
+        } else {
+          showError(result.message);
+        }
+      })
+      .withFailureHandler(function(err) {
+        btn.disabled = false;
+        btn.innerHTML = '🔌 Test &amp; save connection';
+        showError('Something went wrong: ' + err.message);
+      })
+      .saveCredentials(subdomain, email, token);
+  }
+
+  function clearCredentials() {
+    if (!confirm('Clear your saved Zendesk credentials?')) return;
+    google.script.run
+      .withSuccessHandler(function() {
+        document.getElementById('subdomain').value = '';
+        document.getElementById('email').value     = '';
+        document.getElementById('token').value     = '';
+        document.getElementById('token').placeholder = 'Paste your API token here';
+        document.getElementById('existingCreds').style.display = 'none';
+        showSuccess('Credentials cleared.');
+      })
+      .deleteCredentials();
+  }
+
+  function showSuccess(msg) {
+    var b = document.getElementById('statusBanner');
+    b.className = 'status-banner success';
+    b.textContent = msg;
+    b.style.display = 'block';
+  }
+
+  function showError(msg) {
+    var b = document.getElementById('statusBanner');
+    b.className = 'status-banner error';
+    b.textContent = msg;
+    b.style.display = 'block';
+  }
+
+  function hideBanner() {
+    document.getElementById('statusBanner').style.display = 'none';
+  }
+</script>
+</body>
+</html>

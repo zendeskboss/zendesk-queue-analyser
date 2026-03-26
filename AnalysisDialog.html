@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Google Sans', Roboto, Arial, sans-serif;
+      font-size: 13px;
+      color: #202124;
+      background: #f8f9fa;
+      padding: 0;
+    }
+
+    .header {
+      background: #1F3864;
+      color: #fff;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header h2 { font-size: 15px; font-weight: 600; }
+    .header .icon { font-size: 18px; }
+
+    .body { padding: 12px 16px; }
+
+    .section {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #1F3864;
+      margin-bottom: 10px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: #444;
+      margin-bottom: 5px;
+      margin-top: 10px;
+    }
+
+    label:first-of-type { margin-top: 0; }
+
+    input[type="date"], select {
+      width: 100%;
+      padding: 7px 10px;
+      border: 1px solid #dadce0;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #202124;
+      background: #fff;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    input[type="date"]:focus,
+    select:focus { border-color: #1a73e8; box-shadow: 0 0 0 2px #e8f0fe; }
+
+    .date-row { display: flex; gap: 10px; }
+    .date-row > div { flex: 1; }
+
+    .helper-text {
+      font-size: 11px;
+      color: #888;
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+
+    .queue-list-wrap {
+      border: 1px solid #dadce0;
+      border-radius: 6px;
+      background: #fff;
+      max-height: 130px;
+      overflow-y: auto;
+    }
+
+    .queue-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-bottom: 1px solid #f0f0f0;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+
+    .queue-item:last-child { border-bottom: none; }
+    .queue-item:hover { background: #f0f4ff; }
+    .queue-item input[type="checkbox"] { cursor: pointer; width: 14px; height: 14px; }
+    .queue-item label { margin: 0; font-weight: 400; cursor: pointer; color: #333; font-size: 12px; }
+    .queue-item .queue-id { font-size: 10px; color: #aaa; margin-left: auto; font-family: monospace; }
+
+    .channel-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .channel-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border: 2px solid #dadce0;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.15s;
+      background: #fff;
+      color: #666;
+      user-select: none;
+    }
+
+    .channel-chip.active {
+      border-color: #2d7a4f;
+      background: #e6f4ec;
+      color: #2d7a4f;
+    }
+
+    .channel-chip:hover:not(.active) {
+      border-color: #aaa;
+      color: #444;
+      background: #f5f5f5;
+    }
+
+    .chip-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: 0.6;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 9px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, opacity 0.15s;
+    }
+
+    .btn-primary { background: #1F3864; color: #fff; }
+    .btn-primary:hover { background: #16305a; }
+    .btn-primary:disabled { opacity: 0.6; cursor: default; }
+
+    .btn-secondary { background: #f1f3f4; color: #444; }
+    .btn-secondary:hover { background: #e8eaed; }
+
+    #statusArea {
+      display: none;
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      margin-bottom: 12px;
+      line-height: 1.5;
+      white-space: pre-line;
+    }
+
+    #statusArea.success {
+      background: #e6f4ea; color: #137333;
+      border: 1px solid #a8d5b3;
+      display: block;
+    }
+
+    #statusArea.error {
+      background: #fce8e6; color: #c5221f;
+      border: 1px solid #f5c6c4;
+      display: block;
+    }
+
+    #statusArea.loading {
+      background: #e8f0fe; color: #1967d2;
+      border: 1px solid #c5d8fb;
+      display: block;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 11px; height: 11px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+      margin-right: 5px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .select-all-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      align-items: center;
+    }
+
+    .link-btn {
+      background: none;
+      border: none;
+      color: #1a73e8;
+      font-size: 11px;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .loading-state {
+      padding: 20px;
+      text-align: center;
+      color: #888;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <span class="icon">▶️</span>
+    <h2>Run Queue Analysis</h2>
+  </div>
+
+  <div class="body">
+
+    <div id="statusArea"></div>
+
+    <!-- Date range -->
+    <div class="section">
+      <div class="section-title">📅 Date range</div>
+      <div class="date-row">
+        <div>
+          <label>From</label>
+          <input type="date" id="startDate" />
+        </div>
+        <div>
+          <label>To</label>
+          <input type="date" id="endDate" />
+        </div>
+      </div>
+      <div class="helper-text" style="margin-top:6px">Maximum 90 days (Zendesk data retention limit)</div>
+    </div>
+
+    <!-- Queue selection -->
+    <div class="section">
+      <div class="section-title">📋 Queues</div>
+      <div class="select-all-row">
+        <div class="helper-text" style="margin:0">Select queues to include</div>
+        <div>
+          <button class="link-btn" onclick="selectAll()">Select all</button>
+          &nbsp;·&nbsp;
+          <button class="link-btn" onclick="selectNone()">Clear</button>
+        </div>
+      </div>
+      <div class="queue-list-wrap" id="queueList">
+        <div class="loading-state">Loading queues…</div>
+      </div>
+      <div class="helper-text" style="margin-top:5px">Leave all unchecked to analyse all queues</div>
+    </div>
+
+    <!-- Channel selection -->
+    <div class="section">
+      <div class="section-title">📡 Channels</div>
+      <div class="channel-row" id="channelRow">
+        <div class="channel-chip active" id="chip-MESSAGING" onclick="toggleChip('MESSAGING')">
+          <span class="chip-dot"></span> 💬 Messaging
+        </div>
+        <div class="channel-chip active" id="chip-TALK" onclick="toggleChip('TALK')">
+          <span class="chip-dot"></span> 📞 Talk
+        </div>
+        <div class="channel-chip active" id="chip-SUPPORT" onclick="toggleChip('SUPPORT')">
+          <span class="chip-dot"></span> 🎫 Support
+        </div>
+      </div>
+      <div class="helper-text" style="margin-top:6px">At least one channel must be selected</div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-secondary" onclick="google.script.host.close()">Cancel</button>
+      <button class="btn btn-primary" id="runBtn" onclick="runAnalysis()">
+        ▶️ Run analysis
+      </button>
+    </div>
+
+  </div>
+
+<script>
+  var checkedChannels = { MESSAGING: true, TALK: true, SUPPORT: true };
+
+  // ── Initialise ──────────────────────────────────────────────────────────────
+
+  (function init() {
+    var today = new Date();
+    var start = new Date();
+    start.setDate(today.getDate() - 30);
+
+    var minDate = new Date();
+    minDate.setDate(minDate.getDate() - 90);
+
+    document.getElementById('startDate').value = toDateStr(start);
+    document.getElementById('endDate').value   = toDateStr(today);
+    document.getElementById('startDate').min   = toDateStr(minDate);
+    document.getElementById('endDate').min     = toDateStr(minDate);
+    document.getElementById('startDate').max   = toDateStr(today);
+    document.getElementById('endDate').max     = toDateStr(today);
+
+    loadQueues();
+  })();
+
+  function loadQueues() {
+    google.script.run
+      .withSuccessHandler(function(result) {
+        var container = document.getElementById('queueList');
+        if (result.error) {
+          container.innerHTML = '<div class="loading-state" style="color:#c5221f">' + result.error + '</div>';
+          return;
+        }
+        if (result.queues.length === 0) {
+          container.innerHTML = '<div class="loading-state">No queues found. Load queues first.</div>';
+          return;
+        }
+
+        container.innerHTML = '';
+        result.queues.forEach(function(q, i) {
+          var item = document.createElement('div');
+          item.className = 'queue-item';
+
+          var chk = document.createElement('input');
+          chk.type = 'checkbox';
+          chk.id   = 'q_' + i;
+          chk.value = q.id;
+
+          var lbl = document.createElement('label');
+          lbl.htmlFor   = 'q_' + i;
+          lbl.textContent = q.name;
+
+          var idSpan = document.createElement('span');
+          idSpan.className   = 'queue-id';
+          idSpan.textContent = q.id.substring(0, 12) + '…';
+
+          item.appendChild(chk);
+          item.appendChild(lbl);
+          item.appendChild(idSpan);
+          container.appendChild(item);
+        });
+      })
+      .withFailureHandler(function(err) {
+        document.getElementById('queueList').innerHTML =
+          '<div class="loading-state" style="color:#c5221f">Error: ' + err.message + '</div>';
+      })
+      .getQueueListForDialog();
+  }
+
+  // ── Channel chips ───────────────────────────────────────────────────────────
+
+  function toggleChip(channel) {
+    checkedChannels[channel] = !checkedChannels[channel];
+    var chip = document.getElementById('chip-' + channel);
+    if (checkedChannels[channel]) {
+      chip.classList.add('active');
+    } else {
+      chip.classList.remove('active');
+    }
+  }
+
+  // ── Queue select helpers ────────────────────────────────────────────────────
+
+  function selectAll() {
+    document.querySelectorAll('#queueList input[type="checkbox"]').forEach(function(c) {
+      c.checked = true;
+    });
+  }
+
+  function selectNone() {
+    document.querySelectorAll('#queueList input[type="checkbox"]').forEach(function(c) {
+      c.checked = false;
+    });
+  }
+
+  // ── Run ─────────────────────────────────────────────────────────────────────
+
+  function runAnalysis() {
+    var startDate = document.getElementById('startDate').value;
+    var endDate   = document.getElementById('endDate').value;
+
+    if (!startDate || !endDate) {
+      showStatus('error', 'Please select a start and end date.');
+      return;
+    }
+
+    var start    = new Date(startDate);
+    var end      = new Date(endDate);
+    if (end < start) {
+      showStatus('error', 'End date must be on or after the start date.');
+      return;
+    }
+
+    var daysDiff = (end - start) / (1000 * 60 * 60 * 24);
+    if (daysDiff > 90) {
+      showStatus('error', 'Date range is ' + Math.ceil(daysDiff) + ' days. Zendesk only retains 90 days of queue events. Please shorten your date range.');
+      return;
+    }
+
+    // Collect selected queues
+    var queueIds = [];
+    document.querySelectorAll('#queueList input[type="checkbox"]:checked').forEach(function(c) {
+      queueIds.push(c.value);
+    });
+
+    // Collect selected channels
+    var channels = Object.keys(checkedChannels).filter(function(k) { return checkedChannels[k]; });
+    if (channels.length === 0) {
+      showStatus('error', 'Please select at least one channel.');
+      return;
+    }
+
+    var btn = document.getElementById('runBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Running…';
+
+    showStatus('loading', '⏳ Fetching events from Zendesk — this may take a moment for large date ranges…');
+
+    google.script.run
+      .withSuccessHandler(function(result) {
+        btn.disabled = false;
+        btn.innerHTML = '▶️ Run analysis';
+        if (result.error) {
+          showStatus('error', result.error);
+        } else {
+          showStatus('success',
+            '✅ Analysis complete!\n\n' +
+            result.eventCount + ' events processed.\n\n' +
+            'Your results are ready in the ⏱️ Wait Times and 📊 Queue Size sheets.'
+          );
+          btn.textContent = '▶️ Run again';
+        }
+      })
+      .withFailureHandler(function(err) {
+        btn.disabled = false;
+        btn.innerHTML = '▶️ Run analysis';
+        showStatus('error', 'An unexpected error occurred: ' + err.message);
+      })
+      .runAnalysis({ queueIds: queueIds, channels: channels, startDate: startDate, endDate: endDate });
+  }
+
+  function showStatus(type, message) {
+    var el = document.getElementById('statusArea');
+    el.className = type;
+    el.textContent = message;
+    el.style.display = 'block';
+    el.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function toDateStr(d) {
+    return d.getFullYear() + '-' +
+      String(d.getMonth() + 1).padStart(2, '0') + '-' +
+      String(d.getDate()).padStart(2, '0');
+  }
+</script>
+</body>
+</html>
