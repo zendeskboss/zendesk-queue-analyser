@@ -38,7 +38,7 @@ Everything runs inside Google Sheets via Apps Script. No third-party services ar
 
 ### Option A — Copy the template spreadsheet (easiest)
 
-1. Open the [template spreadsheet](#) *(add your published copy link here)*
+1. Open the [template spreadsheet](https://docs.google.com/spreadsheets/d/1AbGFur1z8xwKuHEQHoPLE72hPpa91JqHZX-nI2HswwI/edit?usp=sharing) 
 2. Go to **File → Make a copy**
 3. The script is already embedded — skip straight to [Setup](#setup)
 
